@@ -1,7 +1,7 @@
-
 const jwt = require("jsonwebtoken");
+const db = require("../config/database");
 
-function autenticar(req, res, next) {
+async function autenticar(req, res, next) {
   const autorizacao = req.headers.authorization;
 
   if (!autorizacao || !autorizacao.startsWith("Bearer ")) {
@@ -12,14 +12,40 @@ function autenticar(req, res, next) {
 
   const token = autorizacao.slice(7);
 
+  let dados;
+
   try {
-    const dados = jwt.verify(token, process.env.JWT_SECRET);
+    dados = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (erro) {
+    return res.status(401).json({
+      erro: "Sessão inválida ou expirada. Entre novamente.",
+    });
+  }
+
+  try {
+    const resultado = await db.query(
+      `SELECT id, status
+       FROM usuarios
+       WHERE id = $1`,
+      [dados.id]
+    );
+
+    if (
+      resultado.rows.length === 0 ||
+      resultado.rows[0].status !== "ativa"
+    ) {
+      return res.status(403).json({
+        erro: "Esta conta está desativada ou não existe.",
+      });
+    }
 
     req.usuario = dados;
     next();
   } catch (erro) {
-    return res.status(401).json({
-      erro: "Sessão inválida ou expirada. Entre novamente.",
+    console.error("Erro ao verificar conta:", erro.message);
+
+    return res.status(500).json({
+      erro: "Não foi possível verificar sua conta.",
     });
   }
 }
