@@ -1,3 +1,4 @@
+
 const jwt = require("jsonwebtoken");
 const db = require("../config/database");
 
@@ -24,7 +25,7 @@ async function autenticar(req, res, next) {
 
   try {
     const resultado = await db.query(
-      `SELECT id, status
+      `SELECT id, status, role
        FROM usuarios
        WHERE id = $1`,
       [dados.id]
@@ -39,7 +40,12 @@ async function autenticar(req, res, next) {
       });
     }
 
-    req.usuario = dados;
+    req.usuario = {
+      id: dados.id,
+      email: dados.email,
+      role: resultado.rows[0].role,
+    };
+
     next();
   } catch (erro) {
     console.error("Erro ao verificar conta:", erro.message);

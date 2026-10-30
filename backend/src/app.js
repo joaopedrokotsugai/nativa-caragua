@@ -1,4 +1,5 @@
 require("dotenv").config();
+const adminRoutes = require("./routes/adminRoutes");
 
 const express = require("express");
 const cors = require("cors");
@@ -40,8 +41,8 @@ app.get("/status", async (req, res) => {
 // Registra cada conjunto de rotas uma única vez.
 app.use("/auth", authRoutes);
 app.use("/usuarios", usuariosRoutes);
+app.use("/admin", adminRoutes);
 app.use("/", catalogoRoutes);
-
 
 const PORTA = process.env.PORT || 3333;
 

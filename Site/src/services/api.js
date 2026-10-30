@@ -59,6 +59,25 @@ const real = {
     if (imagem) form.append("imagem", imagem);
     return request("/denuncias", { method: "POST", body: form });
   },
+  // Administração de campanhas
+  cadastrarCampanha: dados =>
+    request("/admin/campanhas", { method: "POST", body: dados }),
+
+  editarCampanha: (id, dados) =>
+    request(`/admin/campanhas/${id}`, { method: "PUT", body: dados }),
+
+  excluirCampanha: id =>
+    request(`/admin/campanhas/${id}`, { method: "DELETE" }),
+
+  // Administração de projetos
+  cadastrarProjeto: dados =>
+    request("/admin/projetos", { method: "POST", body: dados }),
+
+  editarProjeto: (id, dados) =>
+    request(`/admin/projetos/${id}`, { method: "PUT", body: dados }),
+
+  excluirProjeto: id =>
+    request(`/admin/projetos/${id}`, { method: "DELETE" }),
 };
 
 const backend = MODO_DEMO ? mock : real;
@@ -89,14 +108,15 @@ const projetoDaApi = (p) => ({
   imagem: imagemUrl(p.imagem),
 });
 
-const usuarioDaApi = (u) => ({
+const usuarioDaApi = u => ({
   id: String(u.id),
   nome: u.nome,
   email: u.email,
+  role: u.role,
   criadoEm: u.data_criacao,
-  participacoes: (u.participacoes ?? []).map(String), // ids das campanhas em que está inscrito
+  participacoes: (u.participacoes ?? []).map(String),
   totalDoacoes: Number(u.total_doacoes ?? 0),
-  totalDenuncias: Number(u.total_denuncias ?? 0),
+  totalDenuncias: Number(u.total_denuncias ?? 0)
 });
 
 /* ---------- o que as telas usam ---------- */
@@ -111,4 +131,11 @@ export const api = {
   cancelarParticipacao: backend.cancelarParticipacao,
   doar: backend.doar,
   denunciar: backend.denunciar,
+  cadastrarCampanha: backend.cadastrarCampanha,
+  editarCampanha: backend.editarCampanha,
+  excluirCampanha: backend.excluirCampanha,
+
+  cadastrarProjeto: backend.cadastrarProjeto,
+  editarProjeto: backend.editarProjeto,
+  excluirProjeto: backend.excluirProjeto,
 };

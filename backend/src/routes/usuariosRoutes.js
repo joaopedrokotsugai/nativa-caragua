@@ -10,7 +10,7 @@ router.get("/me", autenticar, async (req, res) => {
     const idUsuario = req.usuario.id;
 
     const resultadoUsuario = await db.query(
-      `SELECT id, nome, email, data_criacao, status
+      `SELECT id, nome, email, data_criacao, status, role
        FROM usuarios
        WHERE id = $1`,
       [idUsuario]
@@ -55,12 +55,11 @@ router.get("/me", autenticar, async (req, res) => {
       id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
+      role: usuario.role,
       data_criacao: usuario.data_criacao,
-      participacoes: participacoes.rows.map(
-        (item) => item.id_campanha
-      ),
+      participacoes: participacoes.rows.map(item => item.id_campanha),
       total_doacoes: Number(doacoes.rows[0].total),
-      total_denuncias: Number(denuncias.rows[0].total),
+      total_denuncias: Number(denuncias.rows[0].total)
     });
   } catch (erro) {
     console.error("Erro ao buscar perfil:", erro.message);
