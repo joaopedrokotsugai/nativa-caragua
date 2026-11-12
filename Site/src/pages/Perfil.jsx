@@ -29,11 +29,32 @@ function Estatistica({ icon: Icon, valor, label }) {
   );
 }
 
+function HistoricoItem({ titulo, detalhes, data }) {
+  return (
+    <li className="rounded-xl bg-white p-4 shadow-sm">
+      <h3 className="font-serif-heading text-lg font-bold text-brand-forest">
+        {titulo}
+      </h3>
+
+      {detalhes && (
+        <p className="mt-1 text-sm text-neutral-700">{detalhes}</p>
+      )}
+
+      {data && (
+        <p className="mt-2 text-xs text-neutral-500">
+          {formatData(data)}
+        </p>
+      )}
+    </li>
+  );
+}
+
 function Perfil() {
   usePageTitle("Meu perfil");
   const { usuario, carregandoPerfil, erroPerfil, sair, excluirConta } =
     useAuth();
 
+  const [abaHistorico, setAbaHistorico] = useState("campanhas");
   const navigate = useNavigate();
   const [erro, setErro] = useState("");
   const [saindo, setSaindo] = useState(false); // evita redirecionar para /login quando a pessoa mesma saiu
@@ -183,6 +204,126 @@ function Perfil() {
               </ul>
             </section>
           </div>
+
+
+<div className="mt-10">
+  <div className="mb-5">
+    <h2 className="font-serif-heading text-3xl font-bold text-brand-forest">
+      Meu histórico
+    </h2>
+    <p className="mt-1 text-sm text-neutral-600">
+      Acompanhe suas atividades no Nativa Caraguá.
+    </p>
+  </div>
+
+  <div className="flex flex-wrap gap-2 border-b-2 border-neutral-200">
+    {[
+      { id: "campanhas", label: "Campanhas" },
+      { id: "denuncias", label: "Denúncias" },
+      { id: "doacoes", label: "Doações" },
+    ].map((aba) => (
+      <button
+        key={aba.id}
+        type="button"
+        onClick={() => setAbaHistorico(aba.id)}
+        className={`rounded-t-lg px-5 py-3 text-sm font-semibold transition-colors ${
+          abaHistorico === aba.id
+            ? "border-b-4 border-brand-forest bg-brand-forest text-white"
+            : "text-neutral-600 hover:bg-neutral-100 hover:text-brand-forest"
+        }`}
+        aria-pressed={abaHistorico === aba.id}
+      >
+        {aba.label}
+      </button>
+    ))}
+  </div>
+
+  <div className="min-h-48 rounded-b-2xl bg-neutral-100 p-5">
+    {abaHistorico === "campanhas" && (
+      <section aria-label="Minhas campanhas">
+        <h3 className="mb-4 font-serif-heading text-xl font-bold text-brand-forest">
+          Campanhas em que participo
+        </h3>
+
+        {usuario.participacoes?.length > 0 ? (
+          <ul className="space-y-3">
+            {usuario.participacoes.map((participacao) => (
+              <HistoricoItem
+                key={participacao.id_campanha}
+                titulo={participacao.campanha?.titulo ?? "Campanha não encontrada"}
+                detalhes={[
+                  participacao.campanha?.local,
+                  participacao.campanha?.data
+                    ? `Data da campanha: ${formatData(participacao.campanha.data)}`
+                    : null,
+                ].filter(Boolean).join(" • ")}
+                data={participacao.data_inscricao}
+              />
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-neutral-600">
+            Você ainda não participa de nenhuma campanha.
+          </p>
+        )}
+      </section>
+    )}
+
+    {abaHistorico === "denuncias" && (
+      <section aria-label="Minhas denúncias">
+        <h3 className="mb-4 font-serif-heading text-xl font-bold text-brand-forest">
+          Denúncias registradas
+        </h3>
+
+        {usuario.denuncias?.length > 0 ? (
+          <ul className="space-y-3">
+            {usuario.denuncias.map((denuncia) => (
+              <HistoricoItem
+                key={denuncia.id}
+                titulo={denuncia.titulo}
+                detalhes={`${denuncia.local} • ${denuncia.descricao}`}
+                data={denuncia.data}
+              />
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-neutral-600">
+            Você ainda não registrou nenhuma denúncia.
+          </p>
+        )}
+      </section>
+    )}
+
+    {abaHistorico === "doacoes" && (
+      <section aria-label="Minhas doações">
+        <h3 className="mb-4 font-serif-heading text-xl font-bold text-brand-forest">
+          Doações realizadas
+        </h3>
+
+        {usuario.doacoes?.length > 0 ? (
+          <ul className="space-y-3">
+            {usuario.doacoes.map((doacao) => (
+              <HistoricoItem
+                key={doacao.id}
+                titulo={doacao.projeto?.titulo ?? "Projeto não encontrado"}
+                detalhes={`Valor: ${Number(doacao.valor).toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}`}
+                data={doacao.data}
+              />
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-neutral-600">
+            Você ainda não realizou nenhuma doação.
+          </p>
+        )}
+      </section>
+    )}
+  </div>
+</div>
+
 
           <div className="mt-4">
             <ErroForm>{erro}</ErroForm>

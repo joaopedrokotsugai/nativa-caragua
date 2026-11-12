@@ -57,53 +57,59 @@ function Login() {
     setAviso("");
   }
 
-async function enviar(evento) {
-  evento.preventDefault();
+  async function enviar(evento) {
+    evento.preventDefault();
 
-  const dados = Object.fromEntries(new FormData(evento.currentTarget));
+    const dados = Object.fromEntries(new FormData(evento.currentTarget));
 
-  setEnviando(true);
-  setErro("");
-  setAviso("");
+    setEnviando(true);
+    setErro("");
+    setAviso("");
 
-  try {
-    if (cadastro) {
-      const resultado = await cadastrar(dados);
+    try {
+      if (cadastro) {
+        const resultado = await cadastrar(dados);
 
-      if (resultado?.precisaConfirmarEmail) {
-        setModo("login");
-        setAviso(
-          "Conta criada! Verifique sua caixa de entrada e confirme seu e-mail antes de entrar."
-        );
-        setEnviando(false);
-        return;
+        if (resultado?.precisaConfirmarEmail) {
+          setModo("login");
+          setAviso(
+            "Conta criada! Verifique sua caixa de entrada e confirme seu e-mail antes de entrar."
+          );
+          setEnviando(false);
+          return;
+        }
+      } else {
+        await entrar(dados);
       }
-    } else {
-      await entrar(dados);
-    }
 
-    navigate(destino, { replace: true });
-  } catch (e) {
-    setErro(e.message);
-    setEnviando(false);
+      navigate(destino, { replace: true });
+    } catch (e) {
+      setErro(e.message);
+      setEnviando(false);
+    }
   }
-}
 
   return (
     <div className="px-4 py-8 sm:py-12">
-      <Link to="/" className="mx-auto mb-4 flex w-full max-w-4xl items-center gap-2 text-sm font-semibold text-brand-forest hover:underline">
+      <Link to="/" className="mx-auto mb-4 flex w-full max-w-6xl items-center gap-2 text-sm font-semibold text-black hover:underline">
         <ArrowLeftIcon className="size-4" /> Voltar ao início
       </Link>
 
-      <div className="mx-auto flex max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-xl md:min-h-[34rem] md:flex-row">
-        <div className="flex flex-col items-center justify-center bg-brand-dark px-8 py-10 text-center text-white md:w-2/5">
+      <div className="mx-90 flex max-w-4xl flex-col overflow-hidden rounded-3xl py bg-white shadow-xl md:min-h-[34rem] md:flex-row">
+        <div
+          className="relative flex flex-col items-center justify-center bg-brand-forest bg-cover bg-center px-8 py-10 text-center text-white md:w-2/5"
+          style={{
+            Image:
+              "linear-gradient(rgba(10, 35, 25, 0.72), rgba(10, 35, 25, 0.82)), url('/public/ilha_rochosa.png')",
+          }}
+        >
           <h2 className="font-serif-heading text-3xl leading-snug">
-            {cadastro ? "Bem-vindo de volta!" : "Novo por aqui?"}
+            {cadastro ? "Novo por aqui?" : "Bem-vindo de volta!"}
           </h2>
           <button
             type="button"
             onClick={trocarModo}
-            className="mt-6 w-44 rounded-xl border-2 border-white bg-brand-forest py-3 text-sm font-bold hover:bg-brand-deep"
+            className="mt-6 w-44 rounded-xl border-2 border-white bg-brand-forest py-3 text-sm font-bold hover:bg-gray-600"
           >
             {cadastro ? "Login" : "Criar conta"}
           </button>
