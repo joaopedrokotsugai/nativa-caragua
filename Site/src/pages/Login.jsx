@@ -57,20 +57,37 @@ function Login() {
     setAviso("");
   }
 
-  async function enviar(evento) {
-    evento.preventDefault();
-    const dados = Object.fromEntries(new FormData(evento.currentTarget));
-    setEnviando(true);
-    setErro("");
-    try {
-      if (cadastro) await cadastrar(dados);
-      else await entrar(dados);
-      navigate(destino, { replace: true });
-    } catch (e) {
-      setErro(e.message);
-      setEnviando(false);
+async function enviar(evento) {
+  evento.preventDefault();
+
+  const dados = Object.fromEntries(new FormData(evento.currentTarget));
+
+  setEnviando(true);
+  setErro("");
+  setAviso("");
+
+  try {
+    if (cadastro) {
+      const resultado = await cadastrar(dados);
+
+      if (resultado?.precisaConfirmarEmail) {
+        setModo("login");
+        setAviso(
+          "Conta criada! Verifique sua caixa de entrada e confirme seu e-mail antes de entrar."
+        );
+        setEnviando(false);
+        return;
+      }
+    } else {
+      await entrar(dados);
     }
+
+    navigate(destino, { replace: true });
+  } catch (e) {
+    setErro(e.message);
+    setEnviando(false);
   }
+}
 
   return (
     <div className="px-4 py-8 sm:py-12">

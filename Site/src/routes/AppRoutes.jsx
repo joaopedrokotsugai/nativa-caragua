@@ -13,6 +13,7 @@ import Perfil from "../pages/Perfil";
 import Termos from "../pages/Termos";
 import Privacidade from "../pages/Privacidade";
 import NotFound from "../pages/Notfound";
+import ProtectedRoute from "./ProtectedRoute";
 
 function AppRoutes() {
   return (
@@ -34,7 +35,11 @@ function AppRoutes() {
       {/* Telas de conta: layout limpo */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
-        <Route path="/perfil" element={<Perfil />} />
+
+      {/* Rotas protegidas: requer autenticação */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/perfil" element={<Perfil />} />
+        </Route>
       </Route>
     </Routes>
   );
